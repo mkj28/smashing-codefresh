@@ -2,6 +2,9 @@
   "codefreshBaseUrl": "https://g.codefresh.io",
   "builds": [
     { "repoName": "agent-desktop", "serviceName": "agent-desktop", "repoOwner": "sagansystems" },
-    { "repoName": "supernova", "serviceName": "supernova", "repoOwner": "sagansystems" }
+    { "repoName": "supernova", "serviceName": "supernova", "repoOwner": "sagansystems" },
+    { "repoName": "polaris", "serviceName": "polaris", "repoOwner": "sagansystems" },
+    { "repoName": "scoring", "serviceName": "scoring", "repoOwner": "sagansystems" },
+    { "repoName": "chat-sdk", "serviceName": "chat-sdk", "repoOwner": "sagansystems" }
   ]
 }
