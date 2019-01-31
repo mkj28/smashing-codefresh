@@ -44,7 +44,7 @@ def get_build_health(build)
 
   return {
     name: latest_build['userName'],
-    description: latest_build['commitMessage'].lines.first,
+    description: latest_build['commitMessage'].lines.first.truncate(55),
     status: latest_build['status'] == 'success' ? SUCCESS : FAILED,
     duration: duration,
     codefresh_link: "#{Builds::BUILD_CONFIG['codefreshBaseUrl']}/build/#{latest_build['id']}",
