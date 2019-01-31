@@ -1,0 +1,7 @@
+{
+  "codefreshBaseUrl": "https://g.codefresh.io",
+  "builds": [
+    { "repoName": "agent-desktop", "serviceName": "agent-desktop", "repoOwner": "sagansystems" },
+    { "repoName": "supernova", "serviceName": "supernova", "repoOwner": "sagansystems" }
+  ]
+}
