@@ -8,7 +8,7 @@ CODEFRESH_API_TOKEN = ENV["CODEFRESH_API_TOKEN"]
 SUCCESS = 'Successful'
 FAILED = 'Failed'
 
-SCHEDULER.every '10s' do
+SCHEDULER.every '30s' do
   Builds::BUILD_LIST.each do |build|
     send_event(build['repoName'], get_build_health(build))
   end
