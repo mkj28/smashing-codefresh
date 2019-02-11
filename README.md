@@ -16,7 +16,7 @@ GITHUB_KEY=<oauth app id>
 GITHUB_SECRET=<oauth app secret>
 GITHUB_ORG_ID=<orgs id>
 # Codefresh
-CODEFRESH_API_TOKEN=<top-right on https://g.codefresh.io/api/>
+CODEFRESH_API_TOKEN=<generated in https://g.codefresh.io/account-admin/account-conf/tokens>
 ```
 3. Configure [builds](config/builds.json)
 note: `serviceName` is ~the name of the pipeline

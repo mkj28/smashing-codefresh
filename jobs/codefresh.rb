@@ -61,7 +61,7 @@ def getFromCodefresh(path)
   http.use_ssl = true
   http.verify_mode = OpenSSL::SSL::VERIFY_NONE
   request = Net::HTTP::Get.new(uri.request_uri)
-  request['x-access-token'] = CODEFRESH_API_TOKEN
+  request['Authorization'] = CODEFRESH_API_TOKEN
   response = http.request(request)
 
   json = JSON.parse(response.body)
