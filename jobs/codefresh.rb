@@ -37,9 +37,18 @@ def get_build_health(build)
   successful_count = builds_with_service.count { |build| build['status'] == 'success' }
   latest_build = builds_with_service.first
 
-  start_date = Time.parse latest_build['started']
-  end_date = Time.parse latest_build['finished']
-
+  begin
+    start_date = Time.parse latest_build['started']
+  rescue => e
+    puts "Failed fetching start_date for #{service_name}: #{e}"
+    start_date = Time.new(1970)
+  end
+  begin
+    end_date = Time.parse latest_build['finished'] || Time.new(1970)
+  rescue => e
+    puts "Failed fetching end_date for #{service_name}: #{e}"
+    end_date = Time.new(1970)
+  end
   duration =  TimeDifference.between(start_date, end_date).humanize
 
   return {
