@@ -18,13 +18,17 @@ GITHUB_SECRET=<oauth app secret>
 GITHUB_ORG_ID=<orgs id>
 # Codefresh
 CODEFRESH_API_TOKEN=<generated in https://g.codefresh.io/account-admin/account-conf/tokens>
+# Slack - if you want to send slack notifications
+SLACK_API_TOKEN=<Slack bot token>
+# Redis - used for history, required for Slack
+REDIS_URL=
 ```
 
-3. Configure [builds](config/builds.json):
+3. Configure [pipelines](config/pipelines.json):
 
    make sure `id`s are unique across **entire** file
 
-   `service` is the build id you can see in Codefresh pipeline page / General Settings / WEBHOOK
+   `service` is the pipeline id you can see in Codefresh pipeline page / General Settings / WEBHOOK
 
    You can use `branch_name` to filter to specific branches OR `branch_name_regex`
 

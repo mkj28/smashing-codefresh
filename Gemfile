@@ -19,3 +19,5 @@ end
 group :development do
   gem "ruby-debug-ide", "~> 0.6.1"
 end
+
+gem "redis", "~> 4.1"

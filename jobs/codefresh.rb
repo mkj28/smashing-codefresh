@@ -1,79 +1,120 @@
+# frozen_string_literal: true
+
 require 'net/http'
 require 'json'
 require 'time'
 require 'time_difference'
+require 'slack-ruby-client'
+require 'redis'
 
-CODEFRESH_API_TOKEN = ENV["CODEFRESH_API_TOKEN"]
+CODEFRESH_API_TOKEN = ENV['CODEFRESH_API_TOKEN']
 
 SUCCESS = 'Successful'
 FAILED = 'Failed'
 
-SCHEDULER.every '30s', allow_overlapping: false do
-  Builds::BUILD_LIST.each do |build|
-    send_event(build['id'], get_build_health(build))
+redis_uri = URI.parse(ENV['REDIS_URL'])
+redis = Redis.new(host: redis_uri.host, port: redis_uri.port, password: redis_uri.password)
+
+# initialize Slack
+Slack.configure do |config|
+  config.token = ENV['SLACK_API_TOKEN']
+end
+slack = Slack::Web::Client.new
+
+SCHEDULER.every '10s', allow_overlapping: false do
+  Pipelines::PIPELINE_LIST.each do |pipeline|
+    send_event(pipeline['id'], get_build_health(pipeline, redis, slack))
   end
-  Builds::CUSTOM_REPORTING_BUILD_LIST.each do |build|
-    send_event(build['id'], get_build_health(build))
+  Pipelines::CUSTOM_REPORTING_PIPELINE_LIST.each do |pipeline|
+    send_event(pipeline['id'], get_build_health(pipeline, redis, slack))
   end
 end
 
 def calculate_health(successful_count, count)
-  return (successful_count / count.to_f * 100).round
+  (successful_count / count.to_f * 100).round
 end
 
-def get_build_health(build)
-  service = build['service']
-  builds_to_fetch = build['builds_to_fetch']
-  branch_name = build['branch_name']
-  branch_name_regex = build['branch_name_regex']
+def get_build_health(pipeline, redis, slack)
+  service = pipeline['service']
+  builds_to_fetch = pipeline['builds_to_fetch']
+  branch_name = pipeline['branch_name']
+  branch_name_regex = pipeline['branch_name_regex']
+  slack_channel = pipeline['slack_channel']
 
   # ignore pending builds, filter by branch if provided
-  url = "#{Builds::BUILD_CONFIG['codefreshBaseUrl']}/api/workflow/?limit=#{builds_to_fetch}&page=1&trigger=webhook&trigger=build&service=#{service}#{"&branchName=#{branch_name}" unless branch_name.nil?}&status=error&status=denied&status=success&status=approved&status=terminated"
+  url = "#{Pipelines::PIPELINE_CONFIG['codefreshBaseUrl']}/api/workflow/?limit=#{builds_to_fetch}&page=1&trigger=webhook&trigger=build&service=#{service}#{"&branchName=#{branch_name}" unless branch_name.nil?}&status=error&status=denied&status=success&status=approved&status=terminated"
 
-  json = getFromCodefresh(url)
+  json = get_from_codefresh(url)
 
-  builds = json['workflows']['docs']
-
-  # branch name regex provided
-  if branch_name_regex
-    branch_regex = Regexp.new branch_name_regex
-    builds = builds.select { |build| build['branchName'] =~ branch_regex }
-  end
+  builds = filter_builds(json, branch_name_regex)
 
   successful_count = builds.count { |build| build['status'] == 'success' }
   latest_build = builds.first
 
-  begin
-    start_date = Time.parse latest_build['started']
-  rescue => e
-    puts "Failed fetching start_date for #{service}: #{e}"
-    start_date = Time.new(1970)
-  end
-  begin
-    end_date = Time.parse latest_build['finished'] || Time.new(1970)
-  rescue => e
-    puts "Failed fetching end_date for #{service}: #{e}"
-    end_date = Time.new(1970)
-  end
-  duration =  TimeDifference.between(start_date, end_date).humanize
+  duration = calculate_duration(latest_build['started'], latest_build['finished'])
 
-  return {
+  unless slack_channel.nil?
+    # fetch previous build status and compare with current
+    previous_status = redis.get(pipeline['id'])
+    latest_status = latest_build['status']
+    if latest_status != previous_status
+      # notify slack if status changed
+      notify_slack(slack, slack_channel, latest_build, previous_status)
+    end
+    # store current value
+    redis.set(pipeline['id'], latest_status)
+  end
+
+  {
     repo: latest_build['repoName'],
     name: latest_build['userName'],
     description: latest_build['commitMessage'].lines.first.truncate(55),
     status: latest_build['status'] == 'success' ? SUCCESS : FAILED,
     duration: duration,
-    codefresh_link: "#{Builds::BUILD_CONFIG['codefreshBaseUrl']}/build/#{latest_build['id']}",
+    codefresh_link: "#{Pipelines::PIPELINE_CONFIG['codefreshBaseUrl']}/build/#{latest_build['id']}",
     github_link: latest_build['commitURL'],
     health: calculate_health(successful_count, builds.count),
     time: latest_build['started'],
-    # only show branch if regex provided
-    branch: branch_name_regex ? latest_build['branchName'] : nil
+    branch: latest_build['branchName'],
+    show_branch_name: pipeline['show_branch_name']
   }
 end
 
-def getFromCodefresh(path)
+def notify_slack(slack, channel, build, previous_status)
+  message = "#{build['repoName']} [#{build['branchName']}]: #{previous_status} --> #{build['status']}"\
+  "\n #{Pipelines::PIPELINE_CONFIG['codefreshBaseUrl']}/build/#{build['id']}"\
+  "\n #{build['userName']}: #{build['commitURL']}"
+  slack.chat_postMessage(channel: channel, text: message, as_user: true)
+end
 
+def calculate_duration(started, finished)
+  begin
+    start_date = Time.parse started
+  rescue StandardError => e
+    puts "Failed parsing started date: #{e}"
+    start_date = Time.new(1970)
+  end
+  begin
+    end_date = Time.parse finished || Time.new(1970)
+  rescue StandardError => e
+    puts "Failed parsing finished date: #{e}"
+    end_date = Time.new(1970)
+  end
+  TimeDifference.between(start_date, end_date).humanize
+end
+
+# filters builds if branch name regex provided
+def filter_builds(json, branch_name_regex)
+  builds = json['workflows']['docs']
+  if branch_name_regex
+    branch_regex = Regexp.new branch_name_regex
+    builds = builds.select { |build| build['branchName'] =~ branch_regex }
+  end
+
+  builds
+end
+
+def get_from_codefresh(path)
   uri = URI.parse(path)
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = true
@@ -83,5 +124,5 @@ def getFromCodefresh(path)
   response = http.request(request)
 
   json = JSON.parse(response.body)
-  return json
+  json
 end
