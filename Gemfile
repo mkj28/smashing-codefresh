@@ -1,4 +1,5 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
+ruby "2.6.1"
 
 gem "smashing", "~> 1.1"
 gem "dotenv", "~> 2.6"
@@ -10,9 +11,9 @@ gem "octokit", "~> 4.13"
 gem "omniauth-github", "~> 1.3"
 
 group :test do
-  gem 'rspec'
-  gem 'rspec-mocks'
-  gem 'webmock'
+  gem "rspec"
+  gem "rspec-mocks"
+  gem "webmock"
 end
 
 group :development do
