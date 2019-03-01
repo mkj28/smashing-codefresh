@@ -1,15 +1,13 @@
 source 'https://rubygems.org'
 
-gem 'smashing'
-
-gem 'dotenv'
+gem "smashing", "~> 1.1"
+gem "dotenv", "~> 2.6"
+gem "slack-ruby-client", "~> 0.14.1"
+gem "time_difference", "~> 0.7.0"
 
 ## Github auth
-gem 'omniauth-github'
-gem 'octokit'
-
-gem 'time_difference'
-
+gem "octokit", "~> 4.13"
+gem "omniauth-github", "~> 1.3"
 
 group :test do
   gem 'rspec'
