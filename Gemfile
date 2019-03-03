@@ -21,3 +21,5 @@ group :development do
 end
 
 gem "redis", "~> 4.1"
+
+gem "debase", "~> 0.2.2"

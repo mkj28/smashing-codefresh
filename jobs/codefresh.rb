@@ -12,8 +12,10 @@ CODEFRESH_API_TOKEN = ENV['CODEFRESH_API_TOKEN']
 SUCCESS = 'Successful'
 FAILED = 'Failed'
 
-redis_uri = URI.parse(ENV['REDIS_URL'])
-redis = Redis.new(host: redis_uri.host, port: redis_uri.port, password: redis_uri.password)
+if ENV['REDIS_URL']
+  redis_uri = URI.parse(ENV['REDIS_URL'])
+  redis = Redis.new(host: redis_uri.host, port: redis_uri.port, password: redis_uri.password)
+end
 
 # initialize Slack
 Slack.configure do |config|
@@ -42,7 +44,7 @@ def get_build_health(pipeline, redis, slack)
   slack_channel = pipeline['slack_channel']
 
   # ignore pending builds, filter by branch if provided
-  url = "#{Pipelines::PIPELINE_CONFIG['codefreshBaseUrl']}/api/workflow/?limit=#{builds_to_fetch}&page=1&trigger=webhook&trigger=build&service=#{service}#{"&branchName=#{branch_name}" unless branch_name.nil?}&status=error&status=denied&status=success&status=approved&status=terminated"
+  url = "#{Pipelines::PIPELINE_CONFIG['codefresh_base_url']}/api/workflow/?limit=#{builds_to_fetch}&page=1&trigger=webhook&trigger=build&service=#{service}#{"&branchName=#{branch_name}" unless branch_name.nil?}&status=error&status=denied&status=success&status=approved&status=terminated"
 
   json = get_from_codefresh(url)
 
@@ -53,7 +55,7 @@ def get_build_health(pipeline, redis, slack)
 
   duration = calculate_duration(latest_build['started'], latest_build['finished'])
 
-  unless slack_channel.nil?
+  if !slack_channel.nil? && ENV['SLACK_API_TOKEN']
     # fetch previous build status and compare with current
     previous_status = redis.get(pipeline['id'])
     latest_status = latest_build['status']
@@ -71,7 +73,7 @@ def get_build_health(pipeline, redis, slack)
     description: latest_build['commitMessage'].lines.first.truncate(55),
     status: latest_build['status'] == 'success' ? SUCCESS : FAILED,
     duration: duration,
-    codefresh_link: "#{Pipelines::PIPELINE_CONFIG['codefreshBaseUrl']}/build/#{latest_build['id']}",
+    codefresh_link: "#{Pipelines::PIPELINE_CONFIG['codefresh_base_url']}/build/#{latest_build['id']}",
     github_link: latest_build['commitURL'],
     health: calculate_health(successful_count, builds.count),
     time: latest_build['started'],
@@ -82,7 +84,7 @@ end
 
 def notify_slack(slack, channel, build, previous_status)
   message = "#{build['repoName']} [#{build['branchName']}]: #{previous_status} --> #{build['status']}"\
-  "\n #{Pipelines::PIPELINE_CONFIG['codefreshBaseUrl']}/build/#{build['id']}"\
+  "\n #{Pipelines::PIPELINE_CONFIG['codefresh_base_url']}/build/#{build['id']}"\
   "\n #{build['userName']}: #{build['commitURL']}"
   slack.chat_postMessage(channel: channel, text: message, as_user: true)
 end
@@ -91,14 +93,12 @@ def calculate_duration(started, finished)
   begin
     start_date = Time.parse started
   rescue StandardError => e
-    puts "Failed parsing started date: #{e}"
-    start_date = Time.new(1970)
+    start_date = Time.utc(1970)
   end
   begin
-    end_date = Time.parse finished || Time.new(1970)
+    end_date = Time.parse finished || Time.utc(1970)
   rescue StandardError => e
-    puts "Failed parsing finished date: #{e}"
-    end_date = Time.new(1970)
+    end_date = Time.utc(1970)
   end
   TimeDifference.between(start_date, end_date).humanize
 end

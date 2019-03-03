@@ -1,5 +1,5 @@
 {
-  "codefreshBaseUrl": "https://g.codefresh.io",
+  "codefresh_base_url": "https://g.codefresh.io",
   "pipelines": [
     { "id": "pipeline1", "service": "5a5c2beeced22f000170254e", "branch_name": "master", "builds_to_fetch": 20, "slack_channel": "mmatyjek-public-test" },
     { "id": "pipeline2", "service": "5af21ee3b1d754000172bb2e", "branch_name": "master", "builds_to_fetch": 20, "slack_channel": "mmatyjek-public-test" },
@@ -9,6 +9,6 @@
   ],
   "custom_reporting_pipelines": [
     { "id": "cr1", "service": "5bfa48c56da223c8b46c35ce", "branch_name": "master", "builds_to_fetch": 20, "slack_channel": "custom-reporting-bld" },
-    { "id": "cr2", "service": "5bfa48c56da223c8b46c35ce", "branch_name_regex": "\\d.\\d.\\d", "builds_to_fetch": 200, "show_branch_name": true, "slack_channel": "custom-reporting-bld" }
+    { "id": "cr2", "service": "5bfa48c56da223c8b46c35ce", "branch_name_regex": "\\d\\.\\d\\.\\d", "builds_to_fetch": 200, "show_branch_name": true, "slack_channel": "custom-reporting-bld" }
   ]
 }

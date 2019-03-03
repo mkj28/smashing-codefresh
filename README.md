@@ -21,7 +21,7 @@ CODEFRESH_API_TOKEN=<generated in https://g.codefresh.io/account-admin/account-c
 # Slack - if you want to send slack notifications
 SLACK_API_TOKEN=<Slack bot token>
 # Redis - used for history, required for Slack
-REDIS_URL=
+REDIS_URL=redis://localhost:6379
 ```
 
 3. Configure [pipelines](config/pipelines.json):
@@ -34,7 +34,7 @@ REDIS_URL=
 
    If using `branch_name_regex` make sure to provide high enough `builds_to_fetch` number. Codefresh does not provide filtering by branch so we will fetch all builds and only then filter by branch regex provided.
 
-4. Run `smashing start`
+4. Run `make start`
 5. Open http://localhost:3030
 
 # Deployment
@@ -43,12 +43,9 @@ REDIS_URL=
 
 # Debugging in Visual Studio Code
 
-1. Install dev dependencies `bundle install --with development`
+1. Run `make debug`
 
-2. Start debug session
-   `rdebug-ide --port 1234 --dispatcher-port 26162 --host 0.0.0.0 -- $(bundle show thin)/bin/thin -R config.ru start -p 3030`
-
-3. Attach to rdebug-ide from VSCode
+2. Attach to rdebug-ide from VSCode
 
 # Debugging widget data
 
