@@ -7,9 +7,9 @@ Batman.Filters.durationFormat = (duration) ->
 class Dashing.BuildWindow extends Dashing.Widget
   onData: (data) ->
     if data.status == 'Failed'
-      $(@node).css('background-color', '#a73737')
+      $(@node).css('background-color', 'darkred')
     else if data.status == 'Successful'
-      $(@node).css('background-color', '#03A06E')
+      $(@node).css('background-color', 'darkgreen')
 
   @accessor 'image', ->
     health = @get('health')
