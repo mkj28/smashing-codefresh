@@ -6,35 +6,35 @@
       "service": "5a5c2beeced22f000170254e",
       "branch_name": "master",
       "builds_to_fetch": 20,
-      "slack_channel": "mmatyjek-public-test"
+      "slack_channel": "cf-notification"
     },
     {
       "id": "pipeline2",
       "service": "5af21ee3b1d754000172bb2e",
       "branch_name": "master",
       "builds_to_fetch": 20,
-      "slack_channel": "mmatyjek-public-test"
+      "slack_channel": "cf-notification"
     },
     {
       "id": "pipeline3",
       "service": "5affa49e823069998615f264",
       "branch_name": "master",
       "builds_to_fetch": 20,
-      "slack_channel": "mmatyjek-public-test"
+      "slack_channel": "cf-notification"
     },
     {
       "id": "pipeline4",
       "service": "5af118aecf7afb0001f4fd52",
       "branch_name": "master",
       "builds_to_fetch": 20,
-      "slack_channel": "mmatyjek-public-test"
+      "slack_channel": "cf-notification"
     },
     {
       "id": "pipeline5",
       "service": "5ae6bbd7078e410001229da1",
       "branch_name": "master",
       "builds_to_fetch": 20,
-      "slack_channel": "mmatyjek-public-test"
+      "slack_channel": "cf-notification"
     }
   ],
   "custom_reporting_pipelines": [
