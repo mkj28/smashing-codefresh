@@ -43,6 +43,14 @@
       "service": "5bfa48c56da223c8b46c35ce",
       "branch_name": "master",
       "builds_to_fetch": 20,
+      "slack_channel": "custom-reporting-bld"
+    },
+    {
+      "id": "cr2",
+      "service": "5bfa48c56da223c8b46c35ce",
+      "branch_name_regex": "\\d\\.\\d\\.\\d",
+      "builds_to_fetch": 200,
+      "show_branch_name": true,
       "slack_channel": "custom-reporting-bld",
       "ifttt": {
         "webhook_url_env": "CUSTOM_REPORTING_WEBHOOK",
@@ -51,14 +59,6 @@
         "value2_pass": 1,
         "value2_fail": 1
       }
-    },
-    {
-      "id": "cr2",
-      "service": "5bfa48c56da223c8b46c35ce",
-      "branch_name_regex": "\\d\\.\\d\\.\\d",
-      "builds_to_fetch": 200,
-      "show_branch_name": true,
-      "slack_channel": "custom-reporting-bld"
     }
   ]
 }
