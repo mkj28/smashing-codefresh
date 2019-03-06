@@ -37,6 +37,29 @@ REDIS_URL=redis://localhost:6379
 4. Run `make start`
 5. Open http://localhost:3030
 
+## IFTTT
+You can trigger IFTTT webhooks based on build results. TODO - make it dynamic, for now takes configuration like:
+```
+"ifttt": {
+        "webhook_url_env": "BUILD_RESULT_WEBHOOK",
+        "value1_pass": "#00FF00",
+        "value1_fail": "#FF0000",
+        "value2_pass": 50,
+        "value2_fail": 50
+      }
+```
+where:
+`webhook_url_env` points to the environment variable that holds IFTTT webhook URL (including event name)
+
+`valueX_pass`/`valueX_fail` - will be passed as POST body to IFTTT
+
+For example, for a Smart Life lightbulb you may set your IFTTT event filter to:
+```
+Smartlife.lightColor.setLightColor(MakerWebhooks.event.Value1)
+Smartlife.lightColor.setLightBrightness(MakerWebhooks.event.Value2)
+Smartlife.lightColor.setTurnOnFirst("1")
+```
+
 # Deployment
 
 [Heroku](https://github.com/Smashing/smashing/wiki/How-to%3A-Deploy-to-Heroku)

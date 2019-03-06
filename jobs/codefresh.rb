@@ -67,6 +67,10 @@ def get_build_health(pipeline, redis, slack)
     redis.set(pipeline['id'], latest_status)
   end
 
+  if pipeline['ifttt']
+    notify_ifttt(latest_build['status'] == 'success', pipeline['ifttt'])
+  end
+
   {
     repo: latest_build['repoName'],
     name: latest_build['userName'],
@@ -125,4 +129,30 @@ def get_from_codefresh(path)
 
   json = JSON.parse(response.body)
   json
+end
+
+def notify_ifttt(build_passed, ifttt_config)
+  webhook_env_variable = ifttt_config['webhook_url_env']
+  uri = URI.parse(ENV[webhook_env_variable])
+  header = { 'Content-Type': 'application/json' }
+  user = {
+    value1: build_passed ? ifttt_config['value1_pass'] : ifttt_config['value1_fail'],
+    value2: build_passed ? ifttt_config['value2_pass'] : ifttt_config['value2_fail']
+  }
+
+  # Create the HTTP objects
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+  request = Net::HTTP::Post.new(uri.request_uri, header)
+  request.body = user.to_json
+
+  # Send the request
+  response = http.request(request)
+
+  case response
+  when Net::HTTPSuccess then
+    # OK
+  else
+    puts "IFTTT request failed: #{response.code} #{response.message}: #{response.body}"
+  end
 end

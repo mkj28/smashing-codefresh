@@ -25,6 +25,9 @@ redis:
 start: deps redis
 	smashing start
 
+.PHONY: run
+run: start
+
 .PHONY: debug
 debug: deps-dev redis
 	@echo "$(OK_COLOR)Attach rdebug-ide to port 1234 in VSCode and load http://localhost:3030$(NO_COLOR)"
