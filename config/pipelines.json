@@ -46,10 +46,10 @@
       "slack_channel": "custom-reporting-bld",
       "ifttt": {
         "webhook_url_env": "CUSTOM_REPORTING_WEBHOOK",
-        "value1_pass": "#00FF00",
-        "value1_fail": "#FF0000",
-        "value2_pass": 50,
-        "value2_fail": 50
+        "value1_pass": "#006400",
+        "value1_fail": "#8B0000",
+        "value2_pass": 1,
+        "value2_fail": 1
       }
     },
     {
