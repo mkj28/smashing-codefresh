@@ -6,14 +6,28 @@
       "service": "5a5c2beeced22f000170254e",
       "branch_name": "master",
       "builds_to_fetch": 20,
-      "slack_channel": "cf-notification"
+      "slack_channel": "cf-notification",
+      "ifttt": {
+        "webhook_url_env": "BULB1_WEBHOOK",
+        "value1_pass": "#006400",
+        "value1_fail": "#8B0000",
+        "value2_pass": 1,
+        "value2_fail": 1
+      }
     },
     {
       "id": "pipeline2",
       "service": "5af21ee3b1d754000172bb2e",
       "branch_name": "master",
       "builds_to_fetch": 20,
-      "slack_channel": "cf-notification"
+      "slack_channel": "cf-notification",
+      "ifttt": {
+        "webhook_url_env": "BULB2_WEBHOOK",
+        "value1_pass": "#006400",
+        "value1_fail": "#8B0000",
+        "value2_pass": 1,
+        "value2_fail": 1
+      }
     },
     {
       "id": "pipeline3",
@@ -34,7 +48,14 @@
       "service": "5ae6bbd7078e410001229da1",
       "branch_name": "master",
       "builds_to_fetch": 20,
-      "slack_channel": "cf-notification"
+      "slack_channel": "cf-notification",
+      "ifttt": {
+        "webhook_url_env": "BULB3_WEBHOOK",
+        "value1_pass": "#006400",
+        "value1_fail": "#8B0000",
+        "value2_pass": 1,
+        "value2_fail": 1
+      }
     }
   ],
   "custom_reporting_pipelines": [
