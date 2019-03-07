@@ -53,7 +53,7 @@
       "show_branch_name": true,
       "slack_channel": "custom-reporting-bld",
       "ifttt": {
-        "webhook_url_env": "CUSTOM_REPORTING_WEBHOOK",
+        "webhook_url_env": "BULB4_WEBHOOK",
         "value1_pass": "#006400",
         "value1_fail": "#8B0000",
         "value2_pass": 1,
