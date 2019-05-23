@@ -52,6 +52,8 @@ def get_build_health(pipeline, redis, slack)
 
   successful_count = builds.count { |build| build['status'] == 'success' }
   latest_build = builds.first
+  # set the display name
+  latest_build['displayName'] = pipeline['display_name'] ? pipeline['display_name'] : latest_build['repoName']
 
   duration = calculate_duration(latest_build['started'], latest_build['finished'])
 
@@ -72,7 +74,7 @@ def get_build_health(pipeline, redis, slack)
   end
 
   {
-    repo: latest_build['repoName'],
+    display_name: latest_build['displayName'],
     name: latest_build['userName'],
     description: latest_build['commitMessage'].lines.first.truncate(55),
     status: latest_build['status'] == 'success' ? SUCCESS : FAILED,
@@ -87,7 +89,7 @@ def get_build_health(pipeline, redis, slack)
 end
 
 def notify_slack(slack, channel, build, previous_status)
-  message = "#{build['repoName']} [#{build['branchName']}]: #{previous_status} --> #{build['status']}"\
+  message = "#{build['displayName']} [#{build['branchName']}]: #{previous_status} --> #{build['status']}"\
   "\n #{Pipelines::PIPELINE_CONFIG['codefresh_base_url']}/build/#{build['id']}"\
   "\n #{build['userName']}: #{build['commitURL']}"
   slack.chat_postMessage(channel: channel, text: message, as_user: true)

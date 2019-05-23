@@ -56,6 +56,14 @@
         "value2_pass": 1,
         "value2_fail": 1
       }
+    },
+    {
+      "id": "pipeline6",
+      "display_name": "scaleclient on master",
+      "service": "5cc204d2302435dd272ec7bd",
+      "branch_name": "master",
+      "builds_to_fetch": 20,
+      "slack_channel": "mmatyjek-public-test"
     }
   ],
   "custom_reporting_pipelines": [
