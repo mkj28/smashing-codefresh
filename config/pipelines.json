@@ -5,14 +5,14 @@
       "id": "pipeline1",
       "service": "5a5c2beeced22f000170254e",
       "branch_name": "master",
-      "builds_to_fetch": 20,
+      "builds_to_fetch": 50,
       "slack_channel": "cf-notification"
     },
     {
       "id": "pipeline2",
       "service": "5af21ee3b1d754000172bb2e",
       "branch_name": "master",
-      "builds_to_fetch": 20,
+      "builds_to_fetch": 50,
       "slack_channel": "cf-notification"
     },
     {
