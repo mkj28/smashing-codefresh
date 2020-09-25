@@ -6,8 +6,9 @@
 <h3 data-bind="status"></h3>
 
 <p data-showif="show-health">
-  <img data-bind-src="image"></img>
-  <strong data-bind="health"></strong>% <span class="small">of recent builds passed</span>
+  <img style="float: left; margin: 0px 0px 0px 20px;" data-bind-src="image"></img>
+  <strong data-bind="health"></strong>% <span class="small">of recent builds passed</span></br>
+  <strong data-bind="average_time_to_recover"></strong> <span class="small">average minutes to recover</span>
 </p>
 
 <p class="context-info">

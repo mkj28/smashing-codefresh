@@ -55,7 +55,7 @@ def get_build_health(pipeline, redis, slack)
   # set the display name
   latest_build['displayName'] = pipeline['display_name'] || latest_build['repoName']
 
-  puts " #{latest_build['displayName']}: average: #{calculate_time_to_recover(builds)}"
+  average_time_to_recover = calculate_time_to_recover(builds)
 
   duration = calculate_duration(latest_build['started'], latest_build['finished'])
 
@@ -81,6 +81,7 @@ def get_build_health(pipeline, redis, slack)
     description: latest_build['commitMessage'].lines.first.truncate(55),
     status: latest_build['status'] == 'success' ? SUCCESS : FAILED,
     duration: duration,
+    average_time_to_recover: average_time_to_recover,
     codefresh_link: "#{Pipelines::PIPELINE_CONFIG['codefresh_base_url']}/build/#{latest_build['id']}",
     github_link: latest_build['commitURL'],
     health: calculate_health(successful_count, builds.count),
