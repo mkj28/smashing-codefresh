@@ -53,7 +53,9 @@ def get_build_health(pipeline, redis, slack)
   successful_count = builds.count { |build| build['status'] == 'success' }
   latest_build = builds.first
   # set the display name
-  latest_build['displayName'] = pipeline['display_name'] ? pipeline['display_name'] : latest_build['repoName']
+  latest_build['displayName'] = pipeline['display_name'] || latest_build['repoName']
+
+  puts " #{latest_build['displayName']}: average: #{calculate_time_to_recover(builds)}"
 
   duration = calculate_duration(latest_build['started'], latest_build['finished'])
 
@@ -107,6 +109,35 @@ def calculate_duration(started, finished)
     end_date = Time.utc(1970)
   end
   TimeDifference.between(start_date, end_date).humanize
+end
+
+# returns average minutes it took to recover from build failure
+def calculate_time_to_recover(builds)
+  last_successful_finished_time = Time.utc(1970)
+  last_unsuccessful_finished_time = Time.utc(1970)
+  recovery_times = []
+
+  potential_stream_of_failures = false
+
+  builds.each_with_index do |build, index|
+    if build['status'] === 'success'
+      if potential_stream_of_failures # stream of failures ended, time to calculate recovery time
+        recovery_times << last_successful_finished_time - last_unsuccessful_finished_time
+      end
+      potential_stream_of_failures = false
+      last_successful_finished_time = Time.parse(build['finished'])
+    else
+      potential_stream_of_failures = true
+      last_unsuccessful_finished_time = Time.parse(build['finished'])
+      if index == builds.size - 1 # last build also failure, so be it
+        recovery_times << last_successful_finished_time - last_unsuccessful_finished_time
+      end
+    end
+  end
+
+  return 0 if recovery_times.empty?
+
+  (recovery_times.sum(0.0) / (60 * recovery_times.size)).round
 end
 
 # filters builds if branch name regex provided

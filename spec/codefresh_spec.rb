@@ -121,3 +121,72 @@ describe 'duration calculation' do
     expect(calculated_duration).to eq('1 Minute')
   end
 end
+
+describe 'recovery calculation' do
+  it 'calculates recovery time for simple scenario' do
+    builds = JSON.parse('
+      [
+        {
+          "started": "2020-09-15T07:25:13.999Z",
+          "finished": "2020-09-15T07:35:13.999Z",
+          "status": "success"
+        },
+        {
+          "started": "2020-09-15T07:05:13.999Z",
+          "finished": "2020-09-15T07:15:13.999Z",
+          "status": "error"
+        }
+      ]
+    ')
+    average_recovery = calculate_time_to_recover(builds)
+    expect(average_recovery).to eq(20)
+  end
+
+  it 'calculates recovery time when there were no failures' do
+    builds = JSON.parse('
+      [
+        {
+          "started": "2020-09-15T07:25:13.999Z",
+          "finished": "2020-09-15T07:35:13.999Z",
+          "status": "success"
+        },
+        {
+          "started": "2020-09-15T07:05:13.999Z",
+          "finished": "2020-09-15T07:15:13.999Z",
+          "status": "success"
+        }
+      ]
+    ')
+    average_recovery = calculate_time_to_recover(builds)
+    expect(average_recovery).to eq(0)
+  end
+
+  it 'calculates recovery time with a sequence of failures' do
+    builds = JSON.parse('
+      [
+        {
+          "started": "2020-09-15T07:04:13.999Z",
+          "finished": "2020-09-15T07:05:13.999Z",
+          "status": "success"
+        },
+        {
+          "started": "2020-09-15T07:03:13.999Z",
+          "finished": "2020-09-15T07:04:13.999Z",
+          "status": "error"
+        },
+        {
+          "started": "2020-09-15T07:02:13.999Z",
+          "finished": "2020-09-15T07:03:13.999Z",
+          "status": "terminated"
+        },
+        {
+          "started": "2020-09-15T07:01:13.999Z",
+          "finished": "2020-09-15T07:02:13.999Z",
+          "status": "success"
+        }
+      ]
+    ')
+    average_recovery = calculate_time_to_recover(builds)
+    expect(average_recovery).to eq(2)
+  end
+end
