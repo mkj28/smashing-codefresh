@@ -43,6 +43,14 @@
       "branch_name": "master",
       "builds_to_fetch": 20,
       "slack_channel": "cf-notification"
+    },
+    {
+      "id": "pipeline7",
+      "display_name": "twilio-notifier",
+      "service": "5f3eea9a13df85174d57993c",
+      "branch_name": "master",
+      "builds_to_fetch": 20,
+      "slack_channel": "messaging-notify"
     }
   ],
   "custom_reporting_pipelines": [
